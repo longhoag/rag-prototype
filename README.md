@@ -3,7 +3,7 @@
 This project is to build a full RAG pipeline. My current project archirtecture planned are:
 
 1. Offline:
-   1.1. documents: there's no need for preprocessing the text. The text will be in the file documents.txt in this repo
+   1.1. documents: there's no need for preprocessing the text. The text will be in the file document.txt in this repo
    
    1.2. chunking: strategy: paragraph or sentence split; chunking size: 400-800 tokens; chunking overlap: 80-150 tokens
    
