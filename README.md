@@ -17,3 +17,8 @@ This project is to build a full RAG pipeline. My current project archirtecture p
    2.6. output the answers
 
 These are 2 paths. We need to prepare the vector database and build index first before running the query.
+
+Requirements:
+- use .env file to store API, credentials and we would have a config.py file in the repo to retrieve the credentials consistently and abstractly in the project
+- use poetry for dependencies management
+- use loguru logger instead of printing statements 
