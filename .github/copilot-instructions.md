@@ -41,10 +41,18 @@ This is a full Retrieval-Augmented Generation (RAG) pipeline project in early de
 When implementing features:
 1. Start with `config.py` to establish the configuration pattern
 2. Build offline pipeline first (must run before online queries work)
-3. Implement sentence-based chunking with `nltk.sent_tokenize()` or `spacy` for sentence splitting
+3. Implement sentence-based chunking with `nltk.sent_tokenize()` for sentence splitting
 4. Use `tiktoken` (encoding: `cl100k_base`) to count tokens and enforce 400-800 token chunks
 5. Test embedding generation with small samples before processing full document
 6. Initialize Pinecone index with appropriate dimensions (1536 for text-embedding-3-large)
+
+### Chunking Workflow
+1. **Read document.txt** → Load full text
+2. **Split with nltk** → `nltk.sent_tokenize()` to get list of sentences
+3. **Count with tiktoken** → Combine sentences until you hit 400-800 tokens
+4. **Add overlap** → Include last 80-150 tokens of previous chunk
+5. **Embed with OpenAI** → Use tenacity for retry logic if API fails
+6. **Store in Pinecone** → Use tenacity for retry logic if connection fails
 
 ## Testing Strategy
 
@@ -76,6 +84,7 @@ online/             # Query pipeline
   query.py
   retrieval.py
   generation.py
+docs/               # Documentation markdown files
 pyproject.toml      # Poetry dependencies
 .env                # API credentials (never commit)
 ```
