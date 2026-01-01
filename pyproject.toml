@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "rag-prototype"
+version = "0.1.0"
+description = "Full RAG pipeline with offline indexing and online query stages"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+# TODO: Add dependencies:
+# openai
+# pinecone-client
+# tiktoken
+# nltk
+# loguru
+# tenacity
+# python-dotenv
+
+[tool.poetry.group.dev.dependencies]
+# TODO: Add dev dependencies:
+# pytest
+# pytest-cov
+# black
+# flake8
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
