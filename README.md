@@ -30,3 +30,27 @@ Requirements:
 - use .env file to store API, credentials and we would have a config.py file in the repo to retrieve the credentials consistently and abstractly in the project
 - use poetry for dependencies management
 - use loguru logger instead of printing statements 
+
+## Quick Start
+
+### 1. Install Dependencies
+```bash
+poetry install
+```
+
+### 2. Run Setup Script
+```bash
+poetry run python scripts/setup.py
+```
+
+This will download the required NLTK punkt tokenizer for sentence splitting.
+
+### 3. Configure Environment
+Copy `.env.example` to `.env` and add your API keys:
+```bash
+cp .env.example .env
+# Edit .env with your OpenAI and Pinecone credentials
+```
+
+### 4. Follow Setup Guide
+See [docs/SETUP-GUIDE.md](docs/SETUP-GUIDE.md) for detailed implementation instructions.
