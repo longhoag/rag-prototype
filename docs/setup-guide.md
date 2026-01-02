@@ -48,6 +48,7 @@ This guide walks you through setting up the RAG pipeline project from scratch, i
 For this project with The Alchemist text (~226KB):
 - **Embeddings** (`text-embedding-3-large`): ~$0.13 per 1M tokens
   - Estimated: ~$0.01-0.02 for the entire document
+  - Note: Using 3072 dimensions (full quality) vs 1536 dimensions doesn't affect API costs
 - **Generation** (`gpt-4-turbo`): ~$10 per 1M input tokens, ~$30 per 1M output tokens
   - Estimated: ~$0.10-0.50 per query (depending on retrieved chunks)
 
@@ -79,15 +80,55 @@ For this project with The Alchemist text (~226KB):
 2. **Create a New Index**:
    - Click "Create Index" button
    - **Index Name**: `rag-alchemist` (or your preferred name)
-   - **Dimensions**: `1536` (required for `text-embedding-3-large`)
-   - **Metric**: `cosine` (recommended for text embeddings)
-   - **Pod Type**: Choose based on your plan
-     - Free tier: Select available option (usually `starter`)
-     - Paid: `s1` or `p1` depending on needs
-   - **Cloud/Region**: Choose closest to your location for lower latency
+   
+3. **Configure Index Settings**:
+   
+   **Recommendation**: Use **Model Preset** with **3072 dimensions** for this project. It provides the best embedding quality and is straightforward to configure. The document is small (~226KB), so storage costs are minimal.
+   
+   You have two options:
+   
+   **Option A: Use Model Preset (Recommended)**
+   - Select "Model Preset"
+   - Choose `text-embedding-3-large` from the dropdown
+   - This provides the following configuration:
+     - **Modality**: Text
+     - **Vector Type**: Dense
+     - **Max Input**: 8,191 tokens
+     - **Dimensions**: Choose from `256`, `1024`, or `3072`
+       - **Select `3072`** for highest quality (default for text-embedding-3-large)
+       - Note: `1536` is the default dimension, but it's not listed as a preset option
+       - Lower dimensions (256, 1024) trade quality for storage/cost
+     - **Metric**: `cosine` or `dotproduct` (choose `cosine` for this project)
+   
+   **Important Note**: This model does not support integrated inference. You must manage your own embeddings:
+   - Create OpenAI API key (covered in Part 1)
+   - Generate embeddings using OpenAI API
+   - Upsert embeddings into your Pinecone index (covered in Phase 4)
+   
+   **Option B: Custom Settings**
+   - Select "Custom"
+   - **Vector Type**: Choose `dense` (for text embeddings)
+   - **Dimensions**: Enter `3072` (for text-embedding-3-large full quality)
+     - Or `1536` if using reduced dimensions
+   - **Metric**: Choose `cosine` (recommended for text similarity)
+
+4. **Select Capacity Mode**:
+   - Choose **"On Demand"** (serverless, pay-per-use)
+   - Benefits:
+     - No need to manage pod types or replicas
+     - Automatically scales with usage
+     - More cost-effective for development and variable workloads
+   - Alternative: "Pod-based" (for consistent high-volume workloads)
+
+5. **Cloud and Region**:
+   - Select cloud provider and region closest to your location for lower latency
+   - Common options: `us-east-1`, `us-west-2`, `eu-west-1`
+
+6. **Create Index**:
+   - Review your settings
    - Click "Create Index"
 
-3. **Wait for Index Creation**:
+7. **Wait for Index Creation**:
    - Index initialization takes 1-2 minutes
    - Status will change from "Initializing" to "Ready"
 
@@ -251,14 +292,44 @@ python -c "import nltk; nltk.download('punkt')"
   - Retry on rate limit (429) and server errors (500-599)
 - [ ] Implement function to generate embedding for single chunk:
   - Use `text-embedding-3-large` model
-  - Return 1536-dimensional vector
+  - Default: Return 3072-dimensional vector (full quality)
+  - Optional: Use `dimensions` parameter to reduce to 1536 or lower
+  - Match dimension with your Pinecone index configuration
+- [ ] Implement batch processing for multiple chunks
+- [ ] Add loguru logging for each API call and retry
+- [ ] Add error handling for API failures
+
+**Test**:
+- Test with small sample text (2-3 paragraphs)
+- Verify chunk sizes are within 400-800 tokens
+- Verify overlaps are 80-150 tokens
+- Check no content is lost or duplicated
+
+---
+
+### Phase 3: Offline Pipeline - Embedding (offline/embedding.py)
+
+**Goal**: Generate embeddings for all chunks using OpenAI API
+
+**Implementation checklist**:
+- [ ] Import OpenAI client and tenacity
+- [ ] Initialize OpenAI client with API key from config
+- [ ] Create retry decorator with tenacity:
+  - Stop after 3 attempts
+  - Exponential backoff with jitter
+  - Retry on rate limit (429) and server errors (500-599)
+- [ ] Implement function to generate embedding for single chunk:
+  - Use `text-embedding-3-large` model
+  - Default: Return 3072-dimensional vector (full quality)
+  - Optional: Use `dimensions` parameter to reduce to 1536 or lower
+  - Match dimension with your Pinecone index configuration
 - [ ] Implement batch processing for multiple chunks
 - [ ] Add loguru logging for each API call and retry
 - [ ] Add error handling for API failures
 
 **Test**:
 - Test with 1-2 chunks first
-- Verify embedding dimensions (should be 1536)
+- Verify embedding dimensions (should be 3072 by default, or 1536 if using dimension reduction)
 - Simulate rate limit by making rapid requests
 - Check retry logic works
 
@@ -344,7 +415,8 @@ poetry run python offline/run_indexing.py
 - [ ] Create retry decorator
 - [ ] Implement query embedding function:
   - Use same `text-embedding-3-large` model
-  - Return 1536-dimensional vector
+  - Use same dimensions as indexing (3072 or 1536)
+  - Return vector matching Pinecone index dimensions
 - [ ] Add validation for empty queries
 
 **Test**:

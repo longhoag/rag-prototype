@@ -8,11 +8,11 @@ This is a full Retrieval-Augmented Generation (RAG) pipeline project in early de
 ### Offline Pipeline (Indexing)
 1. **Source Data**: [document.txt](../document.txt) contains The Alchemist text - no preprocessing needed
 2. **Chunking**: Sentence-split strategy with 400-800 tokens per chunk, 80-150 token overlap
-3. **Embedding**: OpenAI `text-embedding-3-large` model
+3. **Embedding**: OpenAI `text-embedding-3-large` model (3072 dimensions for full quality)
 4. **Vector Store**: Pinecone with HNSW index (Pinecone manages HNSW parameters automatically)
 
 ### Online Pipeline (Query)
-1. Embed query with same `text-embedding-3-large` model
+1. Embed query with same `text-embedding-3-large` model (3072 dimensions)
 2. Search Pinecone HNSW index for top-k=10 chunks
 3. Construct prompt from query + retrieved chunks
 4. Generate answer using OpenAI `gpt-5`
@@ -44,7 +44,7 @@ When implementing features:
 3. Implement sentence-based chunking with `nltk.sent_tokenize()` for sentence splitting
 4. Use `tiktoken` (encoding: `cl100k_base`) to count tokens and enforce 400-800 token chunks
 5. Test embedding generation with small samples before processing full document
-6. Initialize Pinecone index with appropriate dimensions (1536 for text-embedding-3-large)
+6. Initialize Pinecone index with 3072 dimensions (text-embedding-3-large full quality)
 
 ### Chunking Workflow
 1. **Read document.txt** → Load full text
@@ -95,3 +95,4 @@ pyproject.toml      # Poetry dependencies
 - Top-k=10 balances context richness with prompt token limits
 - Chunk overlap (80-150 tokens) ensures context continuity across boundaries
 - Sentence boundaries preserve semantic coherence better than fixed-length splits
+- Using 3072 dimensions (vs 1536 or lower) provides highest embedding quality at cost of more storage
