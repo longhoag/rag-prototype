@@ -149,7 +149,7 @@ class TextChunker:
                 
                 # Only use overlap if it meets minimum requirement
                 if overlap_tokens >= self.config.chunk_overlap_min:
-                    current_chunk_sentences = overlap_sentences
+                    current_chunk_sentences = overlap_sentences.copy()
                     current_tokens = overlap_tokens
                     logger.debug(f"Added overlap: {overlap_tokens} tokens")
                 else:
