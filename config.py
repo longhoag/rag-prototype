@@ -32,7 +32,10 @@ class Config:
     chunk_max_tokens: int
     chunk_overlap_min: int
     chunk_overlap_max: int
+    
+    # Retrieval Configuration
     top_k: int
+    retrieval_min_score: float
     
     @classmethod
     def from_env(cls, env_path: Optional[str] = None) -> "Config":
@@ -96,7 +99,10 @@ class Config:
                 chunk_max_tokens=int(os.getenv("CHUNK_MAX_TOKENS", "800")),
                 chunk_overlap_min=int(os.getenv("CHUNK_OVERLAP_MIN", "80")),
                 chunk_overlap_max=int(os.getenv("CHUNK_OVERLAP_MAX", "150")),
+                
+                # Retrieval
                 top_k=int(os.getenv("TOP_K", "10")),
+                retrieval_min_score=float(os.getenv("RETRIEVAL_MIN_SCORE", "0.7")),
             )
             
             # Validate ranges
@@ -111,6 +117,9 @@ class Config:
             
             if config.top_k <= 0:
                 raise ValueError(f"TOP_K must be positive, got {config.top_k}")
+            
+            if not (0.0 <= config.retrieval_min_score <= 1.0):
+                raise ValueError(f"RETRIEVAL_MIN_SCORE must be between 0.0 and 1.0, got {config.retrieval_min_score}")
             
             logger.success("Configuration loaded and validated successfully")
             return config
