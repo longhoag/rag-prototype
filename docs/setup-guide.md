@@ -215,18 +215,15 @@ poetry --version
 # Install all dependencies with Poetry
 poetry install
 
-# Activate the virtual environment
-poetry shell
-
 # Verify Python version
-python --version  # Should be 3.10+
+poetry run python --version  # Should be 3.10+
 ```
 
 ### 3.5 Download NLTK Data
 
 ```bash
 # Run Python to download NLTK punkt tokenizer
-python -c "import nltk; nltk.download('punkt')"
+poetry run python -c "import nltk; nltk.download('punkt')"
 ```
 
 ---
@@ -495,11 +492,8 @@ poetry run pytest tests/ -v
 ### Running the Offline Pipeline (Indexing)
 
 ```bash
-# Activate poetry environment
-poetry shell
-
-# Run indexing
-python offline/run_indexing.py
+# Run indexing with poetry
+poetry run python offline/run_indexing.py
 
 # Expected output:
 # INFO: Reading document.txt...
@@ -514,8 +508,8 @@ python offline/run_indexing.py
 ### Running the Online Pipeline (Query)
 
 ```bash
-# Run query
-python online/run_query.py
+# Run query with poetry
+poetry run python online/run_query.py
 
 # Enter your question:
 > What is Santiago's Personal Legend?
@@ -539,11 +533,11 @@ python online/run_query.py
 
 **1. "Module not found" errors**:
 ```bash
-# Make sure you're in the poetry environment
-poetry shell
-
 # Reinstall dependencies
 poetry install
+
+# Verify installation
+poetry run python -c "import openai, pinecone"
 ```
 
 **2. OpenAI API errors (401 Unauthorized)**:
