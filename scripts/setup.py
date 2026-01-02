@@ -11,8 +11,10 @@ def download_nltk_data():
     """Download required NLTK data packages."""
     logger.info("Downloading NLTK punkt tokenizer...")
     try:
-        nltk.download('punkt', quiet=True)
-        logger.success("Successfully downloaded NLTK punkt tokenizer")
+        # NLTK 3.8+ uses punkt_tab instead of punkt
+        nltk.download('punkt_tab', quiet=True)
+        logger.success("✅ NLTK punkt_tab tokenizer downloaded successfully")
+        logger.info(f"Data location: {nltk.data.path}")
     except Exception as e:
         logger.error(f"Failed to download NLTK data: {e}")
         raise
