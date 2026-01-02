@@ -30,6 +30,7 @@ poetry.lock
 venv/
 ENV/
 env/
+.venv/
 
 # IDE
 .vscode/
