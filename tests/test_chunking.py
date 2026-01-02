@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """
-Quick test script for chunking module.
-Run with: poetry run python test_chunking.py
+Test script for chunking module.
+Run with: poetry run python -m pytest tests/test_chunking.py -v
+Or quick test: poetry run python tests/test_chunking.py
 """
 
+import sys
 from pathlib import Path
 from loguru import logger
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from offline.chunking import chunk_document
 
@@ -14,10 +19,10 @@ def test_chunking():
     """Test the chunking implementation with document.txt"""
     
     # Check if document exists
-    doc_path = Path("document.txt")
+    doc_path = Path(__file__).parent.parent / "document.txt"
     if not doc_path.exists():
         logger.error("document.txt not found in project root")
-        return
+        return False
     
     logger.info("=" * 60)
     logger.info("Testing chunking implementation")
@@ -25,11 +30,11 @@ def test_chunking():
     
     try:
         # Chunk the document
-        chunks = chunk_document("document.txt")
+        chunks = chunk_document(str(doc_path))
         
         if not chunks:
             logger.error("No chunks created!")
-            return
+            return False
         
         # Print summary
         logger.info(f"\n✅ Successfully created {len(chunks)} chunks\n")
@@ -99,10 +104,15 @@ def test_chunking():
         logger.success("Chunking test completed successfully!")
         logger.info("=" * 60)
         
+        return True
+        
     except Exception as e:
         logger.error(f"Test failed: {e}")
-        raise
+        import traceback
+        traceback.print_exc()
+        return False
 
 
 if __name__ == "__main__":
-    test_chunking()
+    success = test_chunking()
+    sys.exit(0 if success else 1)
