@@ -102,6 +102,44 @@ class TextEmbedder:
             logger.error(f"Error embedding texts: {e}")
             raise
     
+    def embed_text(self, text: str) -> List[float]:
+        """
+        Embed a single text string.
+        
+        Args:
+            text: Text string to embed
+            
+        Returns:
+            Embedding vector as a list of floats
+            
+        Raises:
+            Exception: If embedding fails after retries
+        """
+        if not text:
+            raise ValueError("Text cannot be empty")
+        
+        embeddings = self._embed_texts([text])
+        return embeddings[0]
+    
+    def embed_texts(self, texts: List[str]) -> List[List[float]]:
+        """
+        Embed multiple text strings.
+        
+        Args:
+            texts: List of text strings to embed
+            
+        Returns:
+            List of embedding vectors (one per input text)
+            
+        Raises:
+            Exception: If embedding fails after retries
+        """
+        if not texts:
+            return []
+        
+        logger.debug(f"Embedding {len(texts)} texts")
+        return self._embed_texts(texts)
+    
     def embed_chunks(
         self,
         chunks: List[Chunk],
