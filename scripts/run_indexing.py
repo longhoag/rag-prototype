@@ -16,7 +16,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from config import get_config
-from offline.chunking import chunk_file
+from offline.chunking import chunk_document
 from offline.embedding import embed_chunks
 from offline.indexing import index_embedded_chunks
 
@@ -44,7 +44,7 @@ def run_offline_pipeline(document_path: Path) -> None:
     logger.info("STEP 1: Chunking Document")
     logger.info("=" * 70)
     
-    chunks = chunk_file(document_path)
+    chunks = chunk_document(str(document_path))
     
     if not chunks:
         logger.error("No chunks created from document!")
