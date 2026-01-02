@@ -53,14 +53,14 @@ class VectorRetriever:
         
         # Initialize Pinecone client
         self.pc = Pinecone(api_key=self.config.pinecone_api_key)
-        self.index = self.pc.Index(self.config.pinecone_index)
+        self.index = self.pc.Index(self.config.pinecone_index_name)
         
         # Retrieval parameters from config
         self.top_k = self.config.top_k
         self.min_score = self.config.retrieval_min_score
         
         logger.info(
-            f"VectorRetriever initialized with index '{self.config.pinecone_index}', "
+            f"VectorRetriever initialized with index '{self.config.pinecone_index_name}', "
             f"top_k={self.top_k}, min_score={self.min_score}"
         )
     
