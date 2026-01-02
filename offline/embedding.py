@@ -49,9 +49,9 @@ class TextEmbedder:
         self.config = get_config()
         self.client = OpenAI(api_key=self.config.openai_api_key)
         
-        # OpenAI text-embedding-3-large with full 3072 dimensions
-        self.model = "text-embedding-3-large"
-        self.dimensions = 3072
+        # Use embedding model and dimensions from configuration
+        self.model = self.config.openai_embedding_model
+        self.dimensions = self.config.openai_embedding_dimensions
         
         # OpenAI allows up to 2048 texts per batch for embeddings
         self.batch_size = 100  # Conservative batch size for safety
