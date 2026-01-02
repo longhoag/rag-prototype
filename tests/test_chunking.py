@@ -83,22 +83,32 @@ def test_chunking():
         # Check for overlap between consecutive chunks
         if len(chunks) > 1:
             logger.info("🔗 Overlap Analysis:")
-            for i in range(min(3, len(chunks) - 1)):
+            overlaps_found = 0
+            for i in range(min(5, len(chunks) - 1)):
                 chunk1 = chunks[i]
                 chunk2 = chunks[i + 1]
                 
-                # Find common text
-                # Simple approach: check if last part of chunk1 appears in start of chunk2
-                chunk1_end = chunk1.text[-200:]  # Last 200 chars
-                chunk2_start = chunk2.text[:200]  # First 200 chars
+                # Look for common substrings between end of chunk1 and start of chunk2
+                chunk1_end = chunk1.text[-1000:]  # Last 1000 chars
+                chunk2_start = chunk2.text[:1000]  # First 1000 chars
                 
-                has_overlap = any(
-                    chunk1_end[j:j+50] in chunk2_start 
-                    for j in range(0, len(chunk1_end) - 50, 10)
-                )
+                # Find longest common substring
+                max_overlap_length = 0
+                for length in range(50, min(len(chunk1_end), len(chunk2_start)), 5):
+                    for j in range(len(chunk1_end) - length):
+                        substring = chunk1_end[j:j+length]
+                        if substring in chunk2_start:
+                            max_overlap_length = max(max_overlap_length, length)
+                            break
+                
+                has_overlap = max_overlap_length >= 50
+                if has_overlap:
+                    overlaps_found += 1
                 
                 status = "✅" if has_overlap else "⚠️"
-                logger.info(f"  {status} Chunks {i} → {i+1}: {'Overlap detected' if has_overlap else 'No overlap detected'}")
+                logger.info(f"  {status} Chunks {i} → {i+1}: {max_overlap_length} chars overlap")
+            
+            logger.info(f"  Summary: {overlaps_found}/{min(5, len(chunks) - 1)} chunk pairs have overlap detected")
         
         logger.info("\n" + "=" * 60)
         logger.success("Chunking test completed successfully!")
