@@ -87,9 +87,9 @@ class QueryPipeline:
         
         if verbose:
             logger.info(f"Query: {query}")
-            print("\n" + "="*80)
-            print(f"QUERY: {query}")
-            print("="*80 + "\n")
+            logger.info("\n" + "="*80)
+            logger.info(f"QUERY: {query}")
+            logger.info("="*80 + "\n")
         
         # Step 1: Process and embed query
         if verbose:
@@ -101,7 +101,7 @@ class QueryPipeline:
         
         if verbose:
             logger.info(f"Query embedded ({processed_query.embedding_dimensions} dimensions)")
-            print(f"✓ Query processed in {query_time:.2f}s")
+            logger.success(f"✓ Query processed in {query_time:.2f}s")
         
         # Step 2: Retrieve relevant chunks
         if verbose:
@@ -117,15 +117,15 @@ class QueryPipeline:
         
         if verbose:
             logger.info(f"Retrieved {len(retrieved_chunks)} chunks")
-            print(f"✓ Retrieved {len(retrieved_chunks)} chunks in {retrieval_time:.2f}s\n")
+            logger.success(f"✓ Retrieved {len(retrieved_chunks)} chunks in {retrieval_time:.2f}s\n")
             
             if retrieved_chunks:
-                print("Retrieved Chunks:")
-                print("-" * 80)
+                logger.info("Retrieved Chunks:")
+                logger.info("-" * 80)
                 for i, chunk in enumerate(retrieved_chunks, 1):
                     text_preview = chunk.text[:100] + "..." if len(chunk.text) > 100 else chunk.text
-                    print(f"[{i}] {chunk.chunk_id} (score: {chunk.score:.4f})")
-                    print(f"    {text_preview}\n")
+                    logger.info(f"[{i}] {chunk.chunk_id} (score: {chunk.score:.4f})")
+                    logger.info(f"    {text_preview}\n")
         
         # Step 3: Generate answer
         if verbose:
@@ -144,30 +144,30 @@ class QueryPipeline:
         
         if verbose:
             logger.success(f"Answer generated ({response.token_usage['completion_tokens']} tokens)")
-            print(f"✓ Generated in {generation_time:.2f}s\n")
+            logger.success(f"✓ Generated in {generation_time:.2f}s\n")
         
         # Display results
-        print("="*80)
-        print("ANSWER:")
-        print("="*80)
-        print(response.answer)
-        print("\n" + "="*80)
-        print("METADATA:")
-        print("="*80)
-        print(f"Model:            {response.model}")
-        print(f"Sources:          {len(response.sources)} chunks")
-        print(f"Prompt tokens:    {response.token_usage['prompt_tokens']}")
-        print(f"Response tokens:  {response.token_usage['completion_tokens']}")
-        print(f"Total tokens:     {response.token_usage['total_tokens']}")
-        print(f"Total time:       {total_time:.2f}s")
+        logger.info("="*80)
+        logger.info("ANSWER:")
+        logger.info("="*80)
+        logger.info(response.answer)
+        logger.info("\n" + "="*80)
+        logger.info("METADATA:")
+        logger.info("="*80)
+        logger.info(f"Model:            {response.model}")
+        logger.info(f"Sources:          {len(response.sources)} chunks")
+        logger.info(f"Prompt tokens:    {response.token_usage['prompt_tokens']}")
+        logger.info(f"Response tokens:  {response.token_usage['completion_tokens']}")
+        logger.info(f"Total tokens:     {response.token_usage['total_tokens']}")
+        logger.info(f"Total time:       {total_time:.2f}s")
         
         if retrieved_chunks:
-            print(f"\nSource Chunk IDs:")
+            logger.info(f"\nSource Chunk IDs:")
             for i, chunk_id in enumerate(response.sources, 1):
                 score = next(c.score for c in retrieved_chunks if c.chunk_id == chunk_id)
-                print(f"  [{i}] {chunk_id} (similarity: {score:.4f})")
+                logger.info(f"  [{i}] {chunk_id} (similarity: {score:.4f})")
         
-        print("="*80 + "\n")
+        logger.info("="*80 + "\n")
         
         # Return results for programmatic use
         return {
@@ -194,16 +194,16 @@ def interactive_mode(pipeline: QueryPipeline, args):
         pipeline: QueryPipeline instance
         args: Command line arguments
     """
-    print("\n" + "="*80)
-    print("RAG Query Pipeline - Interactive Mode")
-    print("="*80)
-    print("Enter your questions (or 'quit' to exit)")
-    print("Settings:")
-    print(f"  - Top K: {pipeline.top_k}")
-    print(f"  - Min Score: {pipeline.min_score:.2f}")
-    print(f"  - Temperature: {args.temperature}")
-    print(f"  - Model: {pipeline.config.openai_chat_model}")
-    print("="*80 + "\n")
+    logger.info("\n" + "="*80)
+    logger.info("RAG Query Pipeline - Interactive Mode")
+    logger.info("="*80)
+    logger.info("Enter your questions (or 'quit' to exit)")
+    logger.info("Settings:")
+    logger.info(f"  - Top K: {pipeline.top_k}")
+    logger.info(f"  - Min Score: {pipeline.min_score:.2f}")
+    logger.info(f"  - Temperature: {args.temperature}")
+    logger.info(f"  - Model: {pipeline.config.openai_chat_model}")
+    logger.info("="*80 + "\n")
     
     query_count = 0
     total_tokens = 0
@@ -217,7 +217,7 @@ def interactive_mode(pipeline: QueryPipeline, args):
                 continue
             
             if query.lower() in ['quit', 'exit', 'q']:
-                print("\nExiting...")
+                logger.info("\nExiting...")
                 break
             
             # Run pipeline
@@ -232,22 +232,22 @@ def interactive_mode(pipeline: QueryPipeline, args):
             total_tokens += result["token_usage"]["total_tokens"]
             
         except KeyboardInterrupt:
-            print("\n\nInterrupted. Exiting...")
+            logger.info("\n\nInterrupted. Exiting...")
             break
         except Exception as e:
             logger.error(f"Error processing query: {e}")
-            print(f"\n❌ Error: {e}\n")
+            logger.error(f"\n❌ Error: {e}\n")
             continue
     
     # Show session statistics
     if query_count > 0:
-        print("\n" + "="*80)
-        print("SESSION STATISTICS")
-        print("="*80)
-        print(f"Queries processed: {query_count}")
-        print(f"Total tokens used: {total_tokens}")
-        print(f"Avg tokens/query:  {total_tokens / query_count:.1f}")
-        print("="*80 + "\n")
+        logger.info("\n" + "="*80)
+        logger.info("SESSION STATISTICS")
+        logger.info("="*80)
+        logger.info(f"Queries processed: {query_count}")
+        logger.info(f"Total tokens used: {total_tokens}")
+        logger.info(f"Avg tokens/query:  {total_tokens / query_count:.1f}")
+        logger.info("="*80 + "\n")
 
 
 def main():
@@ -327,7 +327,7 @@ Examples:
     
     except Exception as e:
         logger.error(f"Pipeline failed: {e}")
-        print(f"\n❌ Pipeline failed: {e}\n")
+        logger.error(f"\n❌ Pipeline failed: {e}\n")
         sys.exit(1)
 
 
