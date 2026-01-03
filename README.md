@@ -33,10 +33,10 @@ graph TB
         I --> J[Answer with Citations]
     end
     
-    style A fill:#e1f5ff
-    style E fill:#ffe1e1
-    style F fill:#e1ffe1
-    style J fill:#ffe1ff
+    style A fill:#e1f5ff, color:#000
+    style E fill:#ffe1e1, color:#000
+    style F fill:#e1ffe1, color:#000
+    style J fill:#ffe1ff, color:#000
 ```
 
 ## 📁 Project Structure
