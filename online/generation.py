@@ -128,10 +128,13 @@ class ResponseGenerator:
         """
         Call OpenAI API with retry logic.
         
+        Note: GPT-5 models don't support temperature (locked to 1.0) and use
+        max_completion_tokens instead of max_tokens.
+        
         Args:
             messages: List of message dictionaries
-            temperature: Sampling temperature (0-2)
-            max_tokens: Maximum tokens to generate
+            temperature: Sampling temperature (0-2, ignored for GPT-5)
+            max_tokens: Maximum tokens to generate (converted to max_completion_tokens for GPT-5)
             
         Returns:
             API response dictionary
@@ -141,12 +144,26 @@ class ResponseGenerator:
         """
         logger.debug(f"Calling OpenAI API with model {self.model}")
         
-        response = self.client.chat.completions.create(
-            model=self.model,
-            messages=messages,
-            temperature=temperature,
-            max_tokens=max_tokens,
-        )
+        # GPT-5 has different parameter requirements
+        is_gpt5 = self.model.startswith("gpt-5")
+        
+        params = {
+            "model": self.model,
+            "messages": messages,
+        }
+        
+        # GPT-5 doesn't support temperature (locked to 1.0)
+        if not is_gpt5:
+            params["temperature"] = temperature
+        
+        # GPT-5 uses max_completion_tokens instead of max_tokens
+        if max_tokens is not None:
+            if is_gpt5:
+                params["max_completion_tokens"] = max_tokens
+            else:
+                params["max_tokens"] = max_tokens
+        
+        response = self.client.chat.completions.create(**params)
         
         logger.debug("OpenAI API call successful")
         return response
@@ -161,10 +178,13 @@ class ResponseGenerator:
         """
         Generate a response based on query and retrieved context.
         
+        Note: For GPT-5 models, temperature is ignored (locked to 1.0) and
+        max_tokens is automatically converted to max_completion_tokens.
+        
         Args:
             query: The user's question
             retrieved_chunks: List of retrieved document chunks
-            temperature: Sampling temperature (0-2, default 0.7)
+            temperature: Sampling temperature (0-2, default 0.7, ignored for GPT-5)
             max_tokens: Maximum tokens to generate (None for model default)
             
         Returns:
@@ -233,10 +253,12 @@ def generate_response(
     """
     Convenience function to generate a response without explicitly creating a generator.
     
+    Note: For GPT-5 models, temperature is ignored (locked to 1.0).
+    
     Args:
         query: The user's question
         retrieved_chunks: List of retrieved document chunks
-        temperature: Sampling temperature (0-2)
+        temperature: Sampling temperature (0-2, ignored for GPT-5)
         max_tokens: Maximum tokens to generate
         
     Returns:
