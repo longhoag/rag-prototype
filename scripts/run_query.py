@@ -96,7 +96,7 @@ class QueryPipeline:
             logger.info("Step 1/3: Processing query...")
         
         query_start = time.time()
-        processed_query = self.query_processor.process(query)
+        processed_query = self.query_processor.process_query(query)
         query_time = time.time() - query_start
         
         if verbose:
