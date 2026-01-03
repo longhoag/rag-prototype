@@ -37,7 +37,7 @@ class GeneratedResponse:
         return (
             f"GeneratedResponse(answer='{answer_preview}', "
             f"sources={len(self.sources)} chunks, "
-            f"tokens={self.token_usage.get('total', 0)})"
+            f"tokens={self.token_usage.get('total_tokens', 0)})"
         )
 
 
