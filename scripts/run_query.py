@@ -100,7 +100,7 @@ class QueryPipeline:
         query_time = time.time() - query_start
         
         if verbose:
-            logger.info(f"Query embedded ({processed_query.embedding_dimensions} dimensions)")
+            logger.info(f"Query embedded ({processed_query.dimensions} dimensions)")
             logger.success(f"✓ Query processed in {query_time:.2f}s")
         
         # Step 2: Retrieve relevant chunks
